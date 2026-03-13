@@ -18,11 +18,10 @@ public class Cancion {
     private String rutaImagen;
     private GeneroMusical genero;
 
-
     private Date fechaAgregado;
     private Date ultimaReproduccion;
 
-    public Cancion(String nombre, String artista, int duracionSegundos, String rutaImagen,GeneroMusical genero) {
+    public Cancion(String nombre, String artista, int duracionSegundos, String rutaImagen, GeneroMusical genero) {
         this.nombre = nombre;
         this.artista = artista;
         this.duracionSegundos = duracionSegundos;
@@ -32,7 +31,7 @@ public class Cancion {
         this.genero = genero;
     }
 
-    public Cancion(String nombre, String artista, int duracionSegundos,GeneroMusical genero) {
+    public Cancion(String nombre, String artista, int duracionSegundos, GeneroMusical genero) {
         this(nombre, artista, duracionSegundos, "", genero);
     }
 
@@ -88,7 +87,10 @@ public class Cancion {
     public String getDuracionFormateada() {
         int minutos = duracionSegundos / 60;
         int segundos = duracionSegundos % 60;
-        return String.format("%d:%02d", minutos, segundos);
+        if (segundos < 10) {
+            return minutos + ":0" + segundos;
+        }
+        return minutos + ":" + segundos;
     }
 
     public void marcarReproducida() {
@@ -100,7 +102,7 @@ public class Cancion {
     }
 
     public String toString() {
-        return nombre + " - " + artista + " [" + getDuracionFormateada() + "]( "+ genero +" )";
+        return nombre + " - " + artista + " [" + getDuracionFormateada() + "]( " + genero + " )";
     }
 
     @Override
@@ -113,18 +115,15 @@ public class Cancion {
         }
 
         Cancion cancion = (Cancion) obj;
-        return nombre.equalsIgnoreCase(cancion.nombre)
-                && artista.equalsIgnoreCase(cancion.artista);
+
+        return nombre.equalsIgnoreCase(cancion.nombre) && artista.equalsIgnoreCase(cancion.artista);
     }
+
     public GeneroMusical getGenero() {
         return genero;
     }
-    
+
     public void setGenero(GeneroMusical genero) {
         this.genero = genero;
-    }
-    @Override
-    public int hashCode() {
-        return (nombre + artista).toLowerCase().hashCode();
     }
 }
