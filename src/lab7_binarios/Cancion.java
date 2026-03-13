@@ -1,0 +1,122 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package lab7_binarios;
+
+/**
+ *
+ * @author janinadiaz
+ */
+import java.util.Date;
+
+public class Cancion {
+
+    private String nombre;
+    private String artista;
+    private int duracionSegundos;
+    private String rutaImagen;
+
+
+    private Date fechaAgregado;
+    private Date ultimaReproduccion;
+
+    public Cancion(String nombre, String artista, int duracionSegundos, String rutaImagen) {
+        this.nombre = nombre;
+        this.artista = artista;
+        this.duracionSegundos = duracionSegundos;
+        this.rutaImagen = rutaImagen;
+        this.fechaAgregado = new Date();
+        this.ultimaReproduccion = null;
+    }
+
+    public Cancion(String nombre, String artista, int duracionSegundos) {
+        this(nombre, artista, duracionSegundos, "");
+    }
+
+    // Getters y Setters
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public String getArtista() {
+        return artista;
+    }
+
+    public void setArtista(String artista) {
+        this.artista = artista;
+    }
+
+    public int getDuracionSegundos() {
+        return duracionSegundos;
+    }
+
+    public void setDuracionSegundos(int duracionSegundos) {
+        this.duracionSegundos = duracionSegundos;
+    }
+
+    public String getRutaImagen() {
+        return rutaImagen;
+    }
+
+    public void setRutaImagen(String rutaImagen) {
+        this.rutaImagen = rutaImagen;
+    }
+
+    public Date getFechaAgregado() {
+        return fechaAgregado;
+    }
+
+    public void setFechaAgregado(Date fechaAgregado) {
+        this.fechaAgregado = fechaAgregado;
+    }
+
+    public Date getUltimaReproduccion() {
+        return ultimaReproduccion;
+    }
+
+    public void setUltimaReproduccion(Date ultimaReproduccion) {
+        this.ultimaReproduccion = ultimaReproduccion;
+    }
+
+    public String getDuracionFormateada() {
+        int minutos = duracionSegundos / 60;
+        int segundos = duracionSegundos % 60;
+        return String.format("%d:%02d", minutos, segundos);
+    }
+
+    public void marcarReproducida() {
+        this.ultimaReproduccion = new Date();
+    }
+
+    public boolean hasSidoReproducida() {
+        return ultimaReproduccion != null;
+    }
+
+    public String toString() {
+        return nombre + " - " + artista + " [" + getDuracionFormateada() + "]";
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+
+        Cancion cancion = (Cancion) obj;
+        return nombre.equalsIgnoreCase(cancion.nombre)
+                && artista.equalsIgnoreCase(cancion.artista);
+    }
+
+    @Override
+    public int hashCode() {
+        return (nombre + artista).toLowerCase().hashCode();
+    }
+}
