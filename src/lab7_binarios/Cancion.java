@@ -21,6 +21,7 @@ public class Cancion {
 
     private Date fechaAgregado;
     private Date ultimaReproduccion;
+     private int posicionArchivo = -1;
 
     public Cancion(String nombre, String artista, int duracionSegundos, String rutaImagen, String rutaAudio, GeneroMusical genero) {
         this.nombre = nombre;
@@ -134,5 +135,13 @@ public class Cancion {
 
     public void setGenero(GeneroMusical genero) {
         this.genero = genero;
+    }
+    
+    public int getPosicionArchivo() {
+        return posicionArchivo;
+    }
+ 
+    public void setPosicionArchivo(int posicionArchivo) {
+        this.posicionArchivo = posicionArchivo;
     }
 }

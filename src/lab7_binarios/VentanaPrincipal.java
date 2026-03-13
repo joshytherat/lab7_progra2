@@ -60,7 +60,7 @@ public class VentanaPrincipal extends JFrame implements ReproductorMusica.Reprod
 
     public VentanaPrincipal() {
         reproductor = new ReproductorMusica();
-        gestor = new GestorCancionesArchivo(System.getProperty("user.home") + File.separator + "reproductor_canciones.dat");
+        gestor = new GestorCancionesArchivo("data" + File.separator + "reproductor_canciones.dat");
         reproductor.agregarListener(this);
         configurarVentana();
         construirUI();
@@ -371,6 +371,7 @@ public class VentanaPrincipal extends JFrame implements ReproductorMusica.Reprod
             feedback("Selecciona una cancion primero", false);
             return;
         }
+
         if (reproductor.estaPausado()) {
             reproductor.resume();
         } else {
@@ -378,18 +379,26 @@ public class VentanaPrincipal extends JFrame implements ReproductorMusica.Reprod
             reproductor.play(c);
             mostrarInfoCancion(c);
         }
+
+        // bloquear play mientras reproduce
+        btnPlay.setEnabled(false);
     }
 
     private void accionPause() {
         if (reproductor.estaReproduciendo()) {
             reproductor.pause();
-        } else if (reproductor.estaPausado()) {
-            reproductor.resume();
+
+            // permitir usar play para continuar
+            btnPlay.setEnabled(true);
         }
     }
 
     private void accionStop() {
         reproductor.stop();
+
+        btnPlay.setEnabled(true);
+        progressBar.setValue(0);
+        lblTiempoActual.setText("0:00");
     }
 
     private void seleccionar(int idx) {
@@ -503,7 +512,8 @@ public class VentanaPrincipal extends JFrame implements ReproductorMusica.Reprod
 
         Cancion nueva = new Cancion(nombre, artista, duracion, rutaImg, rutaAud, genero);
         try {
-            gestor.guardarCancion(nueva);
+            int posicion = gestor.guardarCancion(nueva);
+            nueva.setPosicionArchivo(posicion); // guardar posición real para poder eliminar luego
             canciones.add(nueva);
             refreshLista();
             cerrarFormulario();
@@ -525,7 +535,12 @@ public class VentanaPrincipal extends JFrame implements ReproductorMusica.Reprod
                 reproductor.stop();
             }
         }
-        gestor.eliminarCancion(idxSel);
+        // Usar la posición REAL en el archivo, no el índice de la lista visible.
+        // Ambos coinciden sólo si nunca se eliminó nada antes; en cuanto hay
+        // registros marcados como inactivos, los índices de la lista divergen
+        // de las posiciones del archivo y se borra el registro equivocado.
+        int posicionReal = c.getPosicionArchivo();
+        gestor.eliminarCancion(posicionReal);
         canciones.remove(idxSel);
         idxSel = -1;
         refreshLista();
@@ -630,18 +645,26 @@ public class VentanaPrincipal extends JFrame implements ReproductorMusica.Reprod
     @Override
     public void onEstadoChanged(EstadoReproductor estado) {
         SwingUtilities.invokeLater(() -> {
+
             lblEstado.setText(estado.getDescripcion().toUpperCase());
+
             switch (estado) {
+
                 case PLAYING:
                     lblEstado.setForeground(ACCENT);
+                    btnPlay.setEnabled(false);
                     break;
+
                 case PAUSED:
                     lblEstado.setForeground(new Color(255, 200, 60));
+                    btnPlay.setEnabled(true);
                     break;
+
                 case STOPPED:
                     lblEstado.setForeground(TEXT_DIM);
                     progressBar.setValue(0);
                     lblTiempoActual.setText("0:00");
+                    btnPlay.setEnabled(true);
                     break;
             }
         });

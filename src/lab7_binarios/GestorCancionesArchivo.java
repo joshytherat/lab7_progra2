@@ -95,39 +95,30 @@ public class GestorCancionesArchivo {
     }
 
     public ArrayList<Cancion> listarCanciones() {
-        ArrayList<Cancion> canciones = new ArrayList<>();
-        RandomAccessFile raf = null;
 
-        try {
-            raf = new RandomAccessFile(rutaArchivo, "r");
-            int totalCanciones = (int) (raf.length() / TAMANIO_REGISTRO);
-            for (int i = 0; i < totalCanciones; i++) {
-                try {
-                    Cancion cancion = leerCancion(i);
-                    if (cancion != null) {
-                        canciones.add(cancion);
-                    }
-                } catch (IOException e) {
-                    System.err.println("Error al leer canción en posicion " + i + ": " + e.getMessage());
-                }
-            }
+    ArrayList<Cancion> canciones = new ArrayList<>();
 
-            System.out.println("Total de canciones activas: " + canciones.size());
+    try (RandomAccessFile raf = new RandomAccessFile(rutaArchivo, "r")) {
 
-        } catch (IOException e) {
-            System.err.println("Error al listar canciones: " + e.getMessage());
-        } finally {
-            if (raf != null) {
-                try {
-                    raf.close();
-                } catch (IOException e) {
-                    System.err.println("Error al cerrar archivo: " + e.getMessage());
-                }
+        int total = (int) (raf.length() / TAMANIO_REGISTRO);
+
+        for (int i = 0; i < total; i++) {
+
+            raf.seek(i * TAMANIO_REGISTRO);
+
+            Cancion c = leerCancionDesdeArchivo(raf);
+
+            if (c != null) {
+                canciones.add(c);
             }
         }
 
-        return canciones;
+    } catch (IOException e) {
+        System.out.println("Error listando canciones: " + e.getMessage());
     }
+
+    return canciones;
+}
 
     public boolean eliminarCancion(int posicion) {
         RandomAccessFile raf = null;
@@ -234,31 +225,49 @@ public class GestorCancionesArchivo {
     }
 
     private Cancion leerCancionDesdeArchivo(RandomAccessFile raf) throws IOException {
-        String nombre = leerStringFijo(raf, TAMANIO_NOMBRE);
-        String artista = leerStringFijo(raf, TAMANIO_ARTISTA);
-        int duracion = raf.readInt();
-        String generoStr = leerStringFijo(raf, TAMANIO_GENERO);
-        GeneroMusical genero;
-        try {
-            genero = GeneroMusical.valueOf(generoStr.trim());
-        } catch (IllegalArgumentException e) {
-            genero = GeneroMusical.OTROS;
-        }
-        String rutaImagen = leerStringFijo(raf, TAMANIO_RUTA_IMAGEN);
-        long fechaMilis = raf.readLong();
-        Date fechaAgregado = new Date(fechaMilis);
 
-        String rutaAudio = leerStringFijo(raf, TAMANIO_RUTA_AUDIO);
+    long inicioRegistro = raf.getFilePointer();
 
-        boolean activo = raf.readBoolean();
-        if (!activo) {
-            return null;
-        }
+    String nombre = leerStringFijo(raf, TAMANIO_NOMBRE);
+    String artista = leerStringFijo(raf, TAMANIO_ARTISTA);
 
-        Cancion cancion = new Cancion(nombre.trim(), artista.trim(), duracion, rutaImagen.trim(), rutaAudio.trim(), genero);
-        cancion.setFechaAgregado(fechaAgregado);
-        return cancion;
+    int duracion = raf.readInt();
+
+    String generoStr = leerStringFijo(raf, TAMANIO_GENERO);
+
+    GeneroMusical genero;
+    try {
+        genero = GeneroMusical.valueOf(generoStr.trim());
+    } catch (Exception e) {
+        genero = GeneroMusical.OTROS;
     }
+
+    String rutaImagen = leerStringFijo(raf, TAMANIO_RUTA_IMAGEN);
+    String rutaAudio = leerStringFijo(raf, TAMANIO_RUTA_AUDIO);
+
+    long fechaMilis = raf.readLong();
+    Date fechaAgregado = new Date(fechaMilis);
+
+    boolean activo = raf.readBoolean();
+
+    
+    if (!activo) {
+        return null;
+    }
+
+    Cancion cancion = new Cancion(
+        nombre.trim(),
+        artista.trim(),
+        duracion,
+        rutaImagen.trim(),
+        rutaAudio.trim(),
+        genero
+    );
+
+    cancion.setFechaAgregado(fechaAgregado);
+
+    return cancion;
+}
 
     private void escribirStringFijo(RandomAccessFile raf, String texto, int tamanio) throws IOException {
         if (texto == null) {
