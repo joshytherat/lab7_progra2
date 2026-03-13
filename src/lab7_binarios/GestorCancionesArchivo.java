@@ -20,8 +20,7 @@ public class GestorCancionesArchivo {
     private static final int TAMANIO_ARTISTA=100;
     private static final int TAMANIO_GENERO=30;
     private static final int TAMANIO_RUTA_IMAGEN=200;
-
-    private static final int TAMANIO_REGISTRO = (TAMANIO_NOMBRE * 2) + (TAMANIO_ARTISTA * 2) + 4 + (TAMANIO_GENERO * 2) + (TAMANIO_RUTA_IMAGEN * 2) + 8 + 1;
+        private static final int TAMANIO_RUTA_AUDIO = 200;  private static final int TAMANIO_REGISTRO = (TAMANIO_NOMBRE * 2) + (TAMANIO_ARTISTA * 2) + 4 + (TAMANIO_GENERO * 2) + (TAMANIO_RUTA_IMAGEN * 2) + (TAMANIO_RUTA_AUDIO * 2) + 8 + 1;
     // total 873 bytes 
 
     private String rutaArchivo;
@@ -238,12 +237,15 @@ public class GestorCancionesArchivo {
         String rutaImagen = leerStringFijo(raf, TAMANIO_RUTA_IMAGEN);
         long fechaMilis = raf.readLong();
         Date fechaAgregado = new Date(fechaMilis);
-
+        
+        String rutaAudio = leerStringFijo(raf, TAMANIO_RUTA_AUDIO);
+        
         boolean activo = raf.readBoolean();
         if (!activo) {
             return null;
         }
-        Cancion cancion = new Cancion(nombre.trim(), artista.trim(), duracion,rutaImagen.trim(), genero);
+
+        Cancion cancion = new Cancion(nombre.trim(), artista.trim(), duracion, rutaImagen.trim(), rutaAudio.trim(), genero);
         cancion.setFechaAgregado(fechaAgregado);
         return cancion;
     }

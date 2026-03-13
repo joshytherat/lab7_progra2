@@ -16,26 +16,27 @@ public class Cancion {
     private String artista;
     private int duracionSegundos;
     private String rutaImagen;
+    private String rutaAudio;
     private GeneroMusical genero;
 
     private Date fechaAgregado;
     private Date ultimaReproduccion;
 
-    public Cancion(String nombre, String artista, int duracionSegundos, String rutaImagen, GeneroMusical genero) {
+    public Cancion(String nombre, String artista, int duracionSegundos, String rutaImagen, String rutaAudio, GeneroMusical genero) {
         this.nombre = nombre;
         this.artista = artista;
         this.duracionSegundos = duracionSegundos;
         this.rutaImagen = rutaImagen;
+        this.rutaAudio = rutaAudio;
         this.fechaAgregado = new Date();
         this.ultimaReproduccion = null;
         this.genero = genero;
     }
 
-    public Cancion(String nombre, String artista, int duracionSegundos, GeneroMusical genero) {
-        this(nombre, artista, duracionSegundos, "", genero);
+    public Cancion(String nombre, String artista, int duracionSegundos, String rutaImagen, GeneroMusical genero) {
+        this(nombre, artista, duracionSegundos, rutaImagen, "", genero);
     }
 
-    // Getters y Setters
     public String getNombre() {
         return nombre;
     }
@@ -66,6 +67,14 @@ public class Cancion {
 
     public void setRutaImagen(String rutaImagen) {
         this.rutaImagen = rutaImagen;
+    }
+
+    public String getRutaAudio() {
+        return rutaAudio;
+    }
+
+    public void setRutaAudio(String rutaAudio) {
+        this.rutaAudio = rutaAudio;
     }
 
     public Date getFechaAgregado() {
