@@ -16,22 +16,24 @@ public class Cancion {
     private String artista;
     private int duracionSegundos;
     private String rutaImagen;
+    private GeneroMusical genero;
 
 
     private Date fechaAgregado;
     private Date ultimaReproduccion;
 
-    public Cancion(String nombre, String artista, int duracionSegundos, String rutaImagen) {
+    public Cancion(String nombre, String artista, int duracionSegundos, String rutaImagen,GeneroMusical genero) {
         this.nombre = nombre;
         this.artista = artista;
         this.duracionSegundos = duracionSegundos;
         this.rutaImagen = rutaImagen;
         this.fechaAgregado = new Date();
         this.ultimaReproduccion = null;
+        this.genero = genero;
     }
 
-    public Cancion(String nombre, String artista, int duracionSegundos) {
-        this(nombre, artista, duracionSegundos, "");
+    public Cancion(String nombre, String artista, int duracionSegundos,GeneroMusical genero) {
+        this(nombre, artista, duracionSegundos, "", genero);
     }
 
     // Getters y Setters
@@ -98,7 +100,7 @@ public class Cancion {
     }
 
     public String toString() {
-        return nombre + " - " + artista + " [" + getDuracionFormateada() + "]";
+        return nombre + " - " + artista + " [" + getDuracionFormateada() + "]( "+ genero +" )";
     }
 
     @Override
@@ -114,7 +116,13 @@ public class Cancion {
         return nombre.equalsIgnoreCase(cancion.nombre)
                 && artista.equalsIgnoreCase(cancion.artista);
     }
-
+    public GeneroMusical getGenero() {
+        return genero;
+    }
+    
+    public void setGenero(GeneroMusical genero) {
+        this.genero = genero;
+    }
     @Override
     public int hashCode() {
         return (nombre + artista).toLowerCase().hashCode();
