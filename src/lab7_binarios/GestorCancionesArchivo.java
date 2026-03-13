@@ -16,12 +16,12 @@ import java.util.Date;
 
 public class GestorCancionesArchivo {
 
-    private static final int TAMANIO_NOMBRE=100;
-    private static final int TAMANIO_ARTISTA=100;
-    private static final int TAMANIO_GENERO=30;
-    private static final int TAMANIO_RUTA_IMAGEN=200;
-        private static final int TAMANIO_RUTA_AUDIO = 200;  private static final int TAMANIO_REGISTRO = (TAMANIO_NOMBRE * 2) + (TAMANIO_ARTISTA * 2) + 4 + (TAMANIO_GENERO * 2) + (TAMANIO_RUTA_IMAGEN * 2) + (TAMANIO_RUTA_AUDIO * 2) + 8 + 1;
-    // total 873 bytes 
+    private static final int TAMANIO_NOMBRE = 100;
+    private static final int TAMANIO_ARTISTA = 100;
+    private static final int TAMANIO_GENERO = 30;
+    private static final int TAMANIO_RUTA_IMAGEN = 200;
+    private static final int TAMANIO_RUTA_AUDIO = 200;
+    private static final int TAMANIO_REGISTRO = (TAMANIO_NOMBRE * 2) + (TAMANIO_ARTISTA * 2) + 4 + (TAMANIO_GENERO * 2) + (TAMANIO_RUTA_IMAGEN * 2) + (TAMANIO_RUTA_AUDIO * 2) + 8 + 1;
 
     private String rutaArchivo;
 
@@ -29,7 +29,7 @@ public class GestorCancionesArchivo {
         this.rutaArchivo = rutaArchivo;
         try {
             File archivo = new File(rutaArchivo);
-            if (!archivo.exists()){
+            if (!archivo.exists()) {
                 archivo.getParentFile().mkdirs();
                 archivo.createNewFile();
             }
@@ -39,7 +39,7 @@ public class GestorCancionesArchivo {
     }
 
     public int guardarCancion(Cancion cancion) throws IOException {
-        RandomAccessFile raf=null;
+        RandomAccessFile raf = null;
         try {
             raf = new RandomAccessFile(rutaArchivo, "rw");
 
@@ -58,7 +58,7 @@ public class GestorCancionesArchivo {
             if (raf != null) {
                 try {
                     raf.close();
-                } catch (IOException e){
+                } catch (IOException e) {
                     System.err.println("Error al cerrar archivo: " + e.getMessage());
                 }
             }
@@ -66,8 +66,8 @@ public class GestorCancionesArchivo {
     }
 
     public Cancion leerCancion(int posicion) throws IOException {
-        RandomAccessFile raf=null;
-        try{
+        RandomAccessFile raf = null;
+        try {
             raf = new RandomAccessFile(rutaArchivo, "r");
             long tamanioArchivo = raf.length();
             long byteOffset = (long) posicion * TAMANIO_REGISTRO;
@@ -79,11 +79,11 @@ public class GestorCancionesArchivo {
             raf.seek(byteOffset);
             return leerCancionDesdeArchivo(raf);
 
-        }catch(IOException e) {
+        } catch (IOException e) {
             System.err.println("Error al leer canción: " + e.getMessage());
             throw e;
         } finally {
-            if(raf != null) {
+            if (raf != null) {
                 try {
                     raf.close();
                 } catch (IOException e) {
@@ -91,30 +91,31 @@ public class GestorCancionesArchivo {
                 }
             }
         }
-        
+
     }
-    public ArrayList<Cancion> listarCanciones(){
+
+    public ArrayList<Cancion> listarCanciones() {
         ArrayList<Cancion> canciones = new ArrayList<>();
         RandomAccessFile raf = null;
 
-        try{
-            raf =new RandomAccessFile(rutaArchivo, "r");
-            int totalCanciones=(int)(raf.length()/TAMANIO_REGISTRO);
-            for (int i=0; i<totalCanciones; i++) {
+        try {
+            raf = new RandomAccessFile(rutaArchivo, "r");
+            int totalCanciones = (int) (raf.length() / TAMANIO_REGISTRO);
+            for (int i = 0; i < totalCanciones; i++) {
                 try {
-                    Cancion cancion =leerCancion(i);
+                    Cancion cancion = leerCancion(i);
                     if (cancion != null) {
                         canciones.add(cancion);
                     }
                 } catch (IOException e) {
-                    System.err.println("Error al leer canción en posicion "+i+": "+ e.getMessage());
+                    System.err.println("Error al leer canción en posicion " + i + ": " + e.getMessage());
                 }
             }
 
             System.out.println("Total de canciones activas: " + canciones.size());
 
         } catch (IOException e) {
-            System.err.println("Error al listar canciones: "+e.getMessage());
+            System.err.println("Error al listar canciones: " + e.getMessage());
         } finally {
             if (raf != null) {
                 try {
@@ -134,8 +135,8 @@ public class GestorCancionesArchivo {
         try {
             raf = new RandomAccessFile(rutaArchivo, "rw");
 
-            long tamanioArchivo=raf.length();
-            long byteOffset =(long)posicion*TAMANIO_REGISTRO;
+            long tamanioArchivo = raf.length();
+            long byteOffset = (long) posicion * TAMANIO_REGISTRO;
 
             if (byteOffset >= tamanioArchivo) {
                 System.out.println("Posición fuera de rango");
@@ -213,13 +214,22 @@ public class GestorCancionesArchivo {
             System.err.println("Error al limpiar archivo: " + e.getMessage());
         }
     }
+
     private void escribirCancion(RandomAccessFile raf, Cancion cancion) throws IOException {
+
         escribirStringFijo(raf, cancion.getNombre(), TAMANIO_NOMBRE);
         escribirStringFijo(raf, cancion.getArtista(), TAMANIO_ARTISTA);
+
         raf.writeInt(cancion.getDuracionSegundos());
+
         escribirStringFijo(raf, cancion.getGenero().name(), TAMANIO_GENERO);
+
         escribirStringFijo(raf, cancion.getRutaImagen(), TAMANIO_RUTA_IMAGEN);
+
+        escribirStringFijo(raf, cancion.getRutaAudio(), TAMANIO_RUTA_AUDIO);
+
         raf.writeLong(cancion.getFechaAgregado().getTime());
+
         raf.writeBoolean(true);
     }
 
@@ -227,7 +237,7 @@ public class GestorCancionesArchivo {
         String nombre = leerStringFijo(raf, TAMANIO_NOMBRE);
         String artista = leerStringFijo(raf, TAMANIO_ARTISTA);
         int duracion = raf.readInt();
-        String generoStr=leerStringFijo(raf, TAMANIO_GENERO);
+        String generoStr = leerStringFijo(raf, TAMANIO_GENERO);
         GeneroMusical genero;
         try {
             genero = GeneroMusical.valueOf(generoStr.trim());
@@ -237,9 +247,9 @@ public class GestorCancionesArchivo {
         String rutaImagen = leerStringFijo(raf, TAMANIO_RUTA_IMAGEN);
         long fechaMilis = raf.readLong();
         Date fechaAgregado = new Date(fechaMilis);
-        
+
         String rutaAudio = leerStringFijo(raf, TAMANIO_RUTA_AUDIO);
-        
+
         boolean activo = raf.readBoolean();
         if (!activo) {
             return null;
@@ -251,22 +261,26 @@ public class GestorCancionesArchivo {
     }
 
     private void escribirStringFijo(RandomAccessFile raf, String texto, int tamanio) throws IOException {
-        if (texto == null) 
+        if (texto == null) {
             texto = "";
-        if (texto.length() > tamanio)
+        }
+        if (texto.length() > tamanio) {
             texto = texto.substring(0, tamanio);
+        }
 
-        while (texto.length() < tamanio) 
+        while (texto.length() < tamanio) {
             texto = texto + " ";
+        }
 
-        for (int i = 0; i < tamanio; i++) 
+        for (int i = 0; i < tamanio; i++) {
             raf.writeChar(texto.charAt(i));
-        
+        }
+
     }
 
     private String leerStringFijo(RandomAccessFile raf, int tamanio) throws IOException {
         String texto = "";
-        for(int i = 0; i < tamanio; i++) {
+        for (int i = 0; i < tamanio; i++) {
             texto = texto + raf.readChar();
         }
 
@@ -275,22 +289,20 @@ public class GestorCancionesArchivo {
 
     public String obtenerInfoArchivo() {
         String info = "";
-        info+= "=== INFORMACION DEL ARCHIVO ===\n";
-        info+="Ruta: "+rutaArchivo + "\n";
-        try (RandomAccessFile raf =new RandomAccessFile(rutaArchivo, "r")) {
-            long tamanioBytes =raf.length();
-            int totalRegistros =(int)(tamanioBytes / TAMANIO_REGISTRO);
+        info += "=== INFORMACION DEL ARCHIVO ===\n";
+        info += "Ruta: " + rutaArchivo + "\n";
+        try (RandomAccessFile raf = new RandomAccessFile(rutaArchivo, "r")) {
+            long tamanioBytes = raf.length();
+            int totalRegistros = (int) (tamanioBytes / TAMANIO_REGISTRO);
 
             info += "Tamaño del archivo: " + tamanioBytes + " bytes\n";
-            info += "Tamaño por registro: "+TAMANIO_REGISTRO + " bytes\n";
-            info += "Total de registros: "+totalRegistros+"\n";
+            info += "Tamaño por registro: " + TAMANIO_REGISTRO + " bytes\n";
+            info += "Total de registros: " + totalRegistros + "\n";
 
         } catch (IOException e) {
-            info +="Error al leer archivo: "+ e.getMessage() + "\n";
+            info += "Error al leer archivo: " + e.getMessage() + "\n";
         }
         return info;
     }
-    
 
-    
 }
