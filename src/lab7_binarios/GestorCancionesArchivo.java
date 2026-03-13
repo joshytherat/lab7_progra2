@@ -225,13 +225,10 @@ public class GestorCancionesArchivo {
     }
 
     private Cancion leerCancionDesdeArchivo(RandomAccessFile raf) throws IOException {
-
         String nombre = leerStringFijo(raf, TAMANIO_NOMBRE);
         String artista = leerStringFijo(raf, TAMANIO_ARTISTA);
-
         int duracion = raf.readInt();
-
-        String generoStr = leerStringFijo(raf, TAMANIO_GENERO);
+        String generoStr=leerStringFijo(raf, TAMANIO_GENERO);
         GeneroMusical genero;
         try {
             genero = GeneroMusical.valueOf(generoStr.trim());
@@ -246,17 +243,14 @@ public class GestorCancionesArchivo {
         if (!activo) {
             return null;
         }
-
         Cancion cancion = new Cancion(nombre.trim(), artista.trim(), duracion,rutaImagen.trim(), genero);
         cancion.setFechaAgregado(fechaAgregado);
-
         return cancion;
     }
 
     private void escribirStringFijo(RandomAccessFile raf, String texto, int tamanio) throws IOException {
         if (texto == null) 
             texto = "";
-
         if (texto.length() > tamanio)
             texto = texto.substring(0, tamanio);
 
@@ -279,21 +273,19 @@ public class GestorCancionesArchivo {
 
     public String obtenerInfoArchivo() {
         String info = "";
-        info += "=== INFORMACION DEL ARCHIVO ===\n";
-        info += "Ruta: " + rutaArchivo + "\n";
-
-        try (RandomAccessFile raf = new RandomAccessFile(rutaArchivo, "r")) {
-            long tamanioBytes = raf.length();
-            int totalRegistros = (int)(tamanioBytes / TAMANIO_REGISTRO);
+        info+= "=== INFORMACION DEL ARCHIVO ===\n";
+        info+="Ruta: "+rutaArchivo + "\n";
+        try (RandomAccessFile raf =new RandomAccessFile(rutaArchivo, "r")) {
+            long tamanioBytes =raf.length();
+            int totalRegistros =(int)(tamanioBytes / TAMANIO_REGISTRO);
 
             info += "Tamaño del archivo: " + tamanioBytes + " bytes\n";
             info += "Tamaño por registro: "+TAMANIO_REGISTRO + " bytes\n";
-            info += "Total de registros: " + totalRegistros + "\n";
+            info += "Total de registros: "+totalRegistros+"\n";
 
         } catch (IOException e) {
-            info += "Error al leer archivo: " + e.getMessage() + "\n";
+            info +="Error al leer archivo: "+ e.getMessage() + "\n";
         }
-
         return info;
     }
     
